@@ -1,4 +1,5 @@
 import ball as b
+import wall as w
 import pygame
 import time
 
@@ -8,7 +9,8 @@ clock = pygame.time.Clock()
 
 screen = pygame.display.set_mode((500,500))
 ball = b.ball(100,100, screen)
-
+wall = w.Wall(screen )
+ball.add_wall_tab(wall)
 running = True
 
 while running:
@@ -31,6 +33,7 @@ while running:
     screen.fill((0,0,0))
     ball.refresh()           
     ball.draw_ball()
+    wall.draw_wall()
 
     pygame.display.flip()
     clock.tick(60)
