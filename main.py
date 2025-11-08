@@ -12,7 +12,6 @@ ball = b.ball(100,100, screen)
 wall = w.Wall(screen )
 ball.add_wall_tab(wall)
 running = True
-
 while running:
     time.sleep(0)
     for event in pygame.event.get():
@@ -20,13 +19,10 @@ while running:
             running = False  
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_a:
-                screen.fill((0,0,0))    
                 ball.send_ball_to_center()
             if event.key == pygame.K_c:
-                screen.fill((0,0,0))    
                 ball.toggle_go_horizontal()
             if event.key == pygame.K_t:
-                screen.fill((0,0,0))
                 ball.send_ball_to_the_top()
             if event.key == pygame.K_g:
                 ball.enable_gravity()
