@@ -5,40 +5,45 @@ import time
 
 
 class ball():
-    def __init__(self, x=0, y=0, screen = None):
-        self.x = x
-        self.y = y
-        self.screen = screen
+    def __init__(self, x=0, y=0, screen = None, wall_tab = [], g_constant = 9.81, e = 0.9, friction = 1/500, radius = 30, gravity = False, initial_horizontal_velocity = 5, initial_vertical_velocity = 2):
+        self.x = x #coordonnées x
+        self.y = y #coordonnées y 
+        self.screen = screen 
+        self.x_c, self.y_c = self.screen.get_size() #dimensions de l'écran
+        self.wall_tab = wall_tab #tableau qui contient la liste des murs à prendre en compte
+        self.last_time = time.time() #Initialisation du temps pour calculer la vitesse
+
         
-        self.g_constant = 9.81
-        self.gravity = False
+        ###___Constantes :
+        #Physiques
+        self.g_constant = g_constant #gravité
+        self.e = e #élasticité (comment la balle pert de l'énergie quand elle rebondie. 1 = 0 perte, 0 = plus d'energie)
+        self.friction = friction #Friction qui sera appliqué sur les déplacement horizontaux de la ball
+        #De la balle
+        self.radius = radius #Rayon de la balle
+        self.gravity = gravity #indique si la gravité des activée
+        
+
+
         
         #Vitesse verticale
         self.vertical_velocity_when_bounce = 0
-        self.vertical_velocity = 50
+        self.vertical_velocity = initial_vertical_velocity
         self.go_up = False
         self.go_down = True
         self.time_start_falling_vertical = 0
         
         #vitesse horizontale
         self.horizontal_velocity_when_bounce = 0
-        self.horizontal_velocity = 5
+        self.horizontal_velocity = initial_horizontal_velocity
         self.go_left = False
         self.go_right = True
         self.time_horizontal = 0
 
-        self.friction = 1/500
-
-        self.initial_speed = 50
-        self.radius = 30
-        self.e = 0.9
-        self.speed_multiplicator = 1
-        self.x_c, self.y_c = self.screen.get_size()
-        self.last_height = self.y_c
-
-        self.wall_tab = []
-
-        self.last_time = time.time()
+        
+        
+        
+        
 
     def set_ball_co(self, x,y):
         """modifie les coordonnées de la balle"""
@@ -51,14 +56,20 @@ class ball():
 
 
     def refresh(self): 
-        """Met à jour tous les paramètres de la balle (mouvement, collision...)"""
+        """Met à jour tous les paramètres de la balle (mouvement, collision...). 
+        Méthode de calcul de vitesse : 
+        verticale : 
+            o si la balle descend : on récupère le temps entre 2 frames (delta_time) puis on ajoute à la vitesse delta_time * g
+            o Si la balle monte : on prend sa vitesse au moment du rebond, on lui soustrait à chaque frame le temps depuis le début de sa montée *g
+        Horizontale : 
+            o Modification linéaire : on soustrais à la vitesse sa vitesse * le coefficient de friction
+        
+        """
         #print(self.vertical_velocity)
         if self.gravity: #si la gravité est activée
             
             if self.go_down: #si la balle descend
-                #self.vertical_velocity = self.g_constant * (time.time()- self.time_start_falling_vertical) + self.initial_speed#on change la vitesse verticale 
                 self.delta_time = time.time() - self.last_time
-                #print(f"delta_time : {self.delta_time}")
                 self.vertical_velocity = self.vertical_velocity + self.g_constant * self.delta_time
                 self.last_time = time.time()
                 
