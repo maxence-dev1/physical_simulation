@@ -15,7 +15,7 @@ class ball():
         
         #Vitesse verticale
         self.vertical_velocity_when_bounce = 0
-        self.vertical_velocity = 0
+        self.vertical_velocity = 50
         self.go_up = False
         self.go_down = True
         self.time_start_falling_vertical = 0
@@ -38,6 +38,8 @@ class ball():
 
         self.wall_tab = []
 
+        self.last_time = time.time()
+
     def set_ball_co(self, x,y):
         """modifie les coordonnées de la balle"""
         self.x = x
@@ -50,19 +52,25 @@ class ball():
 
     def refresh(self): 
         """Met à jour tous les paramètres de la balle (mouvement, collision...)"""
+        #print(self.vertical_velocity)
         if self.gravity: #si la gravité est activée
             
             if self.go_down: #si la balle descend
-                self.vertical_velocity = self.g_constant * (time.time()- self.time_start_falling_vertical) + self.initial_speed#on change la vitesse verticale 
-                self.y += self.vertical_velocity*self.speed_multiplicator #on modifie les co
-                if (self.initial_speed !=0):
-                    print("clear")
-                    self.initial_speed = 0
+                #self.vertical_velocity = self.g_constant * (time.time()- self.time_start_falling_vertical) + self.initial_speed#on change la vitesse verticale 
+                self.delta_time = time.time() - self.last_time
+                #print(f"delta_time : {self.delta_time}")
+                self.vertical_velocity = self.vertical_velocity + self.g_constant * self.delta_time
+                self.last_time = time.time()
+                
+                self.y += self.vertical_velocity
+
             if self.go_up: #si la balle monte
                 self.vertical_velocity = self.vertical_velocity_when_bounce - (self.g_constant *(time.time()- self.time_start_falling_vertical)) #on modifie la vitesse verticale
-                self.y -= self.vertical_velocity*self.speed_multiplicator #on modifie les coordonnées
+                self.y -= self.vertical_velocity
                 if  -0.5 <= self.vertical_velocity <= 0.5: #quand elle arrive vers le max de sa hauteur
+                    
                     self.time_start_falling_vertical = time.time()
+                    self.last_time = time.time()
                     self.toggle_go_vertical()
 
             if self.go_left: #Si la balle va a gauche
@@ -74,8 +82,9 @@ class ball():
                 self.x += self.horizontal_velocity
             
             if   self.y + self.radius + self.vertical_velocity >= self.y_c: #Quand elle rebondie vertical
+                    
                     if self.vertical_velocity < 0.1: #Si la vitesse est trop basse, on arrete
-                        print("aa")
+                        print("Stop")
                         self.vertical_velocity = 0
                         self.friction = self.friction*1.01
                         self.go_down = False
@@ -84,7 +93,7 @@ class ball():
                         self.vertical_bounce_go_down()
             
 
-            if self.y-self.radius-self.vertical_velocity <= 0:
+            if self.y-self.radius-self.vertical_velocity <= 0: #Quand elle cogne le plafond
                  self.vertical_bounce_go_down()
 
             if self.go_left and self.x - self.radius - self.horizontal_velocity <= 0: #Quand elle rebondie horizontal (gauche)
@@ -106,7 +115,6 @@ class ball():
                         self.vertical_bounce_go_down()
                 elif self.go_up:
                     if (wall[0] <= self.x <= wall[0]+wall[2]) and wall[1]<= self.y-self.radius/2-self.vertical_velocity <= wall[1]+wall[3]:
-                        print("wwewewe bounce")
                         self.vertical_bounce_go_up()
                      
                     
@@ -116,6 +124,7 @@ class ball():
                      
     def vertical_bounce_go_down(self):
         """Rebond sur un obstable vertical par rapport à la balle lorsqu'elle descend"""
+        print(f"vertical_bounce_go_down : {self.vertical_velocity}")
         self.vertical_velocity_when_bounce = self.e*self.vertical_velocity
         self.time_start_falling_vertical = time.time()
         self.vertical_velocity = 0
@@ -123,8 +132,9 @@ class ball():
 
     def vertical_bounce_go_up(self):
         """Rebond sur un obstable vertical par rapport à la balle lorsqu'elle monte"""
+        print(f"vertical_bounce_go_up : {self.vertical_velocity}")
         self.time_start_falling_vertical = time.time()
-        self.initial_speed = self.vertical_velocity
+        self.last_time = time.time()
         self.toggle_go_vertical()
     
     def horizontal_bounce(self):

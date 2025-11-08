@@ -9,6 +9,7 @@ clock = pygame.time.Clock()
 
 screen = pygame.display.set_mode((500,500))
 ball = b.ball(100,100, screen)
+ball.send_ball_to_center()
 wall = w.Wall(screen )
 ball.add_wall_tab(wall)
 running = True

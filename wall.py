@@ -2,7 +2,7 @@ import pygame
 
 
 class Wall():
-    def __init__(self,screen, co = (100,300), largeur = 150, hauteur = 10):
+    def __init__(self,screen, co = (0,250), largeur = 500, hauteur = 10):
         self.screen = screen
         self.x = co[0]
         self.y = co[1]
